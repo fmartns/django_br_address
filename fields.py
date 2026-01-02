@@ -1,5 +1,6 @@
 import re
 from django.core.exceptions import ValidationError
+from .validators import validate_cep, validate_uf
 from django.db import models
 
 class CEPField(models.CharField):
@@ -28,10 +29,7 @@ class CEPField(models.CharField):
         value = super().to_python(value)
         if value in (None, ""):
             return value
-        if len(value) != 8:
-            ValidationError("Cep deve conter 8 dígitos.")
-        if value == value[0] * 8:
-            raise ValidationError("CEP inválido.")
+        validate_cep(value)
         return value
 
 class UFField(models.CharField):
@@ -41,3 +39,26 @@ class UFField(models.CharField):
         kwargs.setdefault("max_length", 2)
         super().__init__(*args, **kwargs)
 
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+
+        if kwargs.get("max_length") == 2:
+            del kwargs["max_length"]
+
+        return name, path, args, kwargs
+
+    def to_python(self, value):
+        value = super().to_python(value)
+
+        if value in (None, ""):
+            return value
+
+        return value.strip().upper()
+
+    def get_prep_value(self, value):
+        value = super().to_python(value)
+        if value in (None, ""):
+            return value
+        validate_uf(value)
+        return value

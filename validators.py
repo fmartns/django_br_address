@@ -1,5 +1,5 @@
 import re
-import request
+import requests
 from django.core.exceptions import ValidationError
 
 def validate_cep(value: str):
