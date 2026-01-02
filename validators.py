@@ -8,7 +8,7 @@ def validate_cep(value: str):
     if len(digits) != 8:
         ValidationError("Cep deve conter 8 dígitos.")
 
-    r = requests.get(f"https://viacep.com.br/ws/{digits}/json/", timout=5)
+    r = requests.get(f"https://viacep.com.br/ws/{digits}/json/", timeout=5)
     r.raise_for_status()
     data = r.json()
 
